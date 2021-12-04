@@ -139,6 +139,7 @@ class Usuario extends CI_Controller {
         //1 - Usuário desativado corretamente (Banco)
         //2 - Usuário em Branco
         //6 - Dados não encontrados (Banco)
+        //7 - Não foi possível desativar o usuário, pois já está desativado. (Banco)
         $json = file_get_contents('php://input');
         $resultado = json_decode($json);
 

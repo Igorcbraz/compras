@@ -10,7 +10,9 @@ class Login extends CI_Controller {
         //1 - Usuário e senha validados corretamente | (Banco)    //
         //2 - Faltou informar o usuário              | (Frontend) //
         //3 - Faltou informar a senha                | (Frontend) //
-        //4 - Usuário ou senha inválidos             | (Banco)    //
+        //4 - Usuário desabilitado para acesso       | (Banco)    //
+        //5 - Usuário incorreto                      | (Banco)    //
+        //6 - Senha incorreta                        | (Banco)    //
         ////////////////////////////////////////////////////////////
 
         //Usuário e senha recebidos via JSON e colocados em atributos

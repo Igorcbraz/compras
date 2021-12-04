@@ -11,10 +11,21 @@ class M_usuario extends CI_Model {
 
         //Verificar se a inserção ocorreu com sucesso
         if($this->db->affected_rows() > 0){
+            //Fazemos a inserção no Log na nuvem
+            //Fazemos a instância da model M_log
+            $this->load->model('m_log');
+
+            //Fazemos a chamada do método de inserção do Log
+            $retorno_log = $this->m_log->inserir_log($usu_sistema, $sql);
+
             if($retorno_log['codigo'] == 1){
                 $dados = array('codigo' => 1,
                                'msg' => 'Usuário cadastrado corretamente');
+            } else {
+                $dados = array('codigo' => 8,
+                               'msg' => 'Houve um problema no salvamento do LOG, porém, usuário cadastrado corretamente');
             } 
+            
         } else {
             $dados = array('codigo' => 6,
                            'msg' => 'Houve algum problema na inserção na tabela usuários');
@@ -123,17 +134,32 @@ class M_usuario extends CI_Model {
     }
 
     public function desativar($usuario){
-        //Query de atualização dos dados 
-        $this->db->query("UPDATE usuarios SET estatus = 'D'
-                          WHERE usuario = '$usuario'");
+        //Query de consulta para saber se o usuário está desativado
+        $sql = "SELECT estatus FROM usuarios WHERE estatus = 'D' AND usuario = '$usuario'";
 
-        //Verificar se a atualização ocorreu com sucesso
-        if($this->db->affected_rows() > 0){
-            $dados = array('codigo' => 1,
-                           'msg' => 'Usuário DESATIVADO corretamente');
-        } else {
-            $dados = array('codigo' => 6,
-                           'msg' => 'Houve algum problema na DESATIVAÇÃO do usuário');
+        $this->db->query($sql);
+
+        $retorno = $this->db->query($sql);
+
+        //fazendo a verificação se há algum usuário retornado na consulta
+        if($retorno->num_rows() > 0){
+            $dados = array('codigo' => 7,
+                           'msg' => 'Não foi possível desativar o usuário, pois já está desativado.');
+        }else{
+            
+            //Desativando usuário
+            $this->db->query("UPDATE usuarios SET estatus = 'D'
+                            WHERE usuario = '$usuario'");
+
+            //Verificar se a atualização ocorreu com sucesso
+            if($this->db->affected_rows() > 0){
+                $dados = array('codigo' => 1,
+                            'msg' => 'Usuário DESATIVADO corretamente');
+            } else {
+                $dados = array('codigo' => 6,
+                            'msg' => 'Houve algum problema na DESATIVAÇÃO do usuário');
+            }
+            
         }
         //Envia o array $dados com as informações tratadas
         //acima pela estrutura de decisão if

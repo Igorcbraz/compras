@@ -19,13 +19,39 @@ class M_acesso extends CI_Model {
         //1 - Codigo da mensagem
         //2 - Descrição da mensagem
 
+
+        //Verificando se usuário está desativado na hora do login
+        $retorno_desativado = $this->db->query("SELECT * FROM usuarios
+                                     WHERE usuario = '$usuario'
+                                       AND senha   = md5('$senha')
+                                       AND estatus = 'D'");
+
+        //Verificando se o usuário está correto
+        $retorno_usuario = $this->db->query("SELECT * FROM usuarios
+                                             WHERE usuario = '$usuario'");
+
+        //Verificando se a senha está correta
+        $retorno_senha = $this->db->query("SELECT * FROM usuarios
+                                           WHERE senha = md5('$senha')");
+
+        //Estruturas de decisão conforme as verificações acima
         if($retorno->num_rows() > 0){
             $dados = array('codigo' => 1,
-                           'msg' => 'Usuário correto');
-        } else {
-            $dados = array('codigo' => 4,
-                           'msg' => 'Usuário ou senha inválidos');
+                        'msg' => 'Usuário correto');
         }
+        elseif($retorno_desativado->num_rows() > 0){
+            $dados = array('codigo' => 4,
+                           'msg' => 'Usuário desabilitado para acesso');
+        }
+        elseif($retorno_usuario->num_rows() == 0){
+            $dados = array('codigo' => 5,
+                           'msg' => 'Usuário incorreto');
+        }
+        elseif($retorno_senha->num_rows() == 0){
+            $dados = array('codigo' => 6,
+                           'msg' => 'Senha incorreta');
+        }
+
         //Envia o array $dados com as informações tratadas
         //acima pela estrutura de decisão if
 
